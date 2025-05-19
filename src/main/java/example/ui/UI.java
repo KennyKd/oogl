@@ -4,20 +4,33 @@
  */
 package example.ui;
 import example.Main;
+import example.TernarySearchTree;
+import example.Trie;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+
+
+
 
 /**
  *
  * @author kenny
  */
 public class UI extends javax.swing.JFrame {
-
     /**
      * Creates new form UI
      */
+
     public UI() {
         initComponents();
-        
-        
     }
 
     /**
@@ -29,6 +42,8 @@ public class UI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        trie = new Trie();
+        tst = new TernarySearchTree();
         jFrame1 = new javax.swing.JFrame();
         jInternalFrame1 = new javax.swing.JInternalFrame();
         jLabel1 = new javax.swing.JLabel();
@@ -53,6 +68,8 @@ public class UI extends javax.swing.JFrame {
         jLabel21 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel();
+        button1 = new java.awt.Button();
+        jLabel5 = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -126,6 +143,102 @@ public class UI extends javax.swing.JFrame {
 
         jLabel23.setText("Word-loading TST time spent: ---");
 
+        button1.setLabel("button1");
+        button1.addActionListener(new java.awt.event.ActionListener() {
+            String inputText = jTextArea1.getText();
+            String[] textList = inputText.split("\\s+");
+            String wordInput = textList[textList.length - 1];
+            
+            try {
+                // Track memory before initialization
+                Runtime runtime = Runtime.getRuntime();
+                System.gc(); // Request garbage collection to get more accurate memory readings
+                String beforeInitMemory = Main.formatMemorySize(runtime.totalMemory() - runtime.freeMemory());
+                // System.out.println("Initial memory usage: " + formatMemorySize(beforeInitMemory));
+
+                System.gc(); // Request garbage collection
+                long beforeTrieMemory = runtime.totalMemory() - runtime.freeMemory();
+                List<String> allDataMain = new ArrayList<>();
+
+                // Load only Trie first to measure its memory usage
+                long startTimeTrie = System.nanoTime();
+                Main.loadTrieDictionary("filtered_words.csv");
+                long endTimeTrie = System.nanoTime();
+
+                System.gc(); // Request garbage collection
+                long afterTrieMemory = runtime.totalMemory() - runtime.freeMemory();
+                String trieTimeSpent = (endTimeTrie - startTimeTrie) + " ns";
+                long trieMemoryUsage = afterTrieMemory - beforeTrieMemory;
+
+                // Now create and load TST
+                System.out.println("\n===== LOADING TST =====");
+                System.gc(); // Request garbage collection
+                long beforeTSTMemory = runtime.totalMemory() - runtime.freeMemory();
+
+                long startTimeTST = System.nanoTime();
+                Main.loadTSTDictionary("filtered_words.csv");
+                long endTimeTST = System.nanoTime();
+
+                System.gc(); // Request garbage collection
+                long afterTSTMemory = runtime.totalMemory() - runtime.freeMemory();
+                String tstTimeSpent = (endTimeTST - startTimeTST) + " ns";
+                long tstMemoryUsage = afterTSTMemory - beforeTSTMemory;
+
+                // Compare memory usage
+                // System.out.println("Trie vs TST memory difference: " + formatMemorySize(Math.abs(trieMemoryUsage - tstMemoryUsage)));
+                allDataMain.add(formatMemorySize(Math.abs(trieMemoryUsage - tstMemoryUsage)));
+                if (trieMemoryUsage > tstMemoryUsage) {
+                    // System.out.println("Trie uses more memory by " +
+                    //         String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
+                    allDataMain.add("Trie uses more memory by " + String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
+                } else if (tstMemoryUsage > trieMemoryUsage) {
+                    // System.out.println("TST uses more memory by " +
+                    //         String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
+                    allDataMain.add("TST uses more memory by " + String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
+                } else {
+                    // System.out.println("Both data structures use the same amount of memory.");
+                    allDataMain.add("Both data structures use the same amount of memory.");
+                }
+
+                // Test the autocomplete system
+                // String input = "prog";
+
+                // Memory before Trie suggestion
+                System.gc();
+
+                // RUNNING TRIE
+                List<List<String>> trieOutput = autocomplete.suggestWithTrie(wordInput, 5);
+                // System.out.println("Time taken by Trie: " + (endTime - startTime) + " ns");
+
+                // Memory after Trie suggestion
+                System.gc();
+                // System.out.println("Memory used during Trie suggestion: " +
+                //         formatMemorySize(afterTrieSuggestionMemory - beforeTrieSuggestionMemory));
+                
+
+                // Memory before TST suggestion
+                System.gc();
+
+                // RUNNING TST
+                List<List<String>> tstOutput = autocomplete.suggestWithTST(wordInput, 5);
+                // System.out.println("Time taken by TST: " + (endTime - startTime) + " ns");
+
+                // Memory after TST suggestion
+                System.gc();
+                // System.out.println("Memory used during TST suggestion: " +
+                //         formatMemorySize(afterTSTSuggestionMemory - beforeTSTSuggestionMemory));
+
+            } catch (IOException | CsvException e) {
+                e.printStackTrace();
+            }
+
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button1ActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Memory Info: ");
+
         javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
         jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
         jInternalFrame1Layout.setHorizontalGroup(
@@ -133,14 +246,6 @@ public class UI extends javax.swing.JFrame {
             .addGroup(jInternalFrame1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                        .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel13)
-                            .addComponent(jLabel10)
-                            .addComponent(jLabel2)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 591, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jInternalFrame1Layout.createSequentialGroup()
                         .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jInternalFrame1Layout.createSequentialGroup()
@@ -172,7 +277,20 @@ public class UI extends javax.swing.JFrame {
                             .addGroup(jInternalFrame1Layout.createSequentialGroup()
                                 .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                        .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel1)
+                                .addComponent(jLabel13)
+                                .addComponent(jLabel10)
+                                .addComponent(jLabel2)
+                                .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 591, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jInternalFrame1Layout.setVerticalGroup(
@@ -193,32 +311,37 @@ public class UI extends javax.swing.JFrame {
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel22)
                     .addComponent(jLabel23))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addComponent(jLabel13)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addComponent(jLabel13)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addGap(1, 1, 1)
-                        .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                                .addComponent(jLabel9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel12)))
-                        .addGap(34, 34, 34)
-                        .addComponent(jLabel10))
-                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(1, 1, 1)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                                .addComponent(jLabel16)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel17))
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(jLabel7)
+                                .addGap(1, 1, 1)
+                                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                                        .addComponent(jLabel9)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel12)))
+                                .addGap(34, 34, 34)
+                                .addComponent(jLabel10))
+                            .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(1, 1, 1)
+                                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                                        .addComponent(jLabel16)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel17))
+                                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -241,6 +364,10 @@ public class UI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_button1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -278,6 +405,7 @@ public class UI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private java.awt.Button button1;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JLabel jLabel1;
@@ -294,6 +422,7 @@ public class UI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JList<String> jList1;

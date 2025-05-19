@@ -1,19 +1,16 @@
 package example;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 
 public class Main {
     private final Trie trie;
     private final TernarySearchTree tst;
-    private final Map<String, Integer> wordFrequencies;
     public static String beforeInitMemory;
     public static long trieLoadTime;
     public static long tstLoadTime;
@@ -142,14 +139,14 @@ public class Main {
         return allData;
     }
 
-    private static String formatMemorySize(long bytes) {
+    public static String formatMemorySize(long bytes) {
         if (bytes < 1024) return bytes + " B";
         int exp = (int) (Math.log(bytes) / Math.log(1024));
         String pre = "KMGTPE".charAt(exp-1) + "B";
         return String.format("%.2f %s", bytes / Math.pow(1024, exp), pre);
     }
 
-    private void loadTrieDictionary(String dictionaryFile) throws IOException, CsvException {
+    public void loadTrieDictionary(String dictionaryFile) throws IOException, CsvException {
         int wordCount = 0;
         try (CSVReader reader = new CSVReader(new FileReader(dictionaryFile))) {
             List<String[]> rows = reader.readAll();
@@ -166,9 +163,6 @@ public class Main {
                 if (!word.isEmpty()) {
                     // Insert each word and their frequency into Trie
                     trie.insert(word, count);
-
-                    // Add to wordFrequencies
-                    wordFrequencies.put(word, count);
                     wordCount++;
                 }
             }
@@ -176,7 +170,7 @@ public class Main {
         // System.out.println("Loaded " + wordCount + " words into Trie");
     }
 
-    private void loadTSTDictionary(String dictionaryFile) throws IOException, CsvException {
+    public void loadTSTDictionary(String dictionaryFile) throws IOException, CsvException {
         int wordCount = 0;
         try (CSVReader reader = new CSVReader(new FileReader(dictionaryFile))) {
             List<String[]> rows = reader.readAll();
