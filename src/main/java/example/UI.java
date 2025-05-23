@@ -2,29 +2,22 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package example.ui;
-import example.Main;
-import example.TernarySearchTree;
-import example.Trie;
-
+package example;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-
-
-
 
 /**
  *
  * @author kenny
  */
 public class UI extends javax.swing.JFrame {
+    private Trie trie;
+    private TernarySearchTree tst;
+
     /**
      * Creates new form UI
      */
@@ -100,21 +93,25 @@ public class UI extends javax.swing.JFrame {
         jLabel3.setText("TST");
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = {};
+            @Override
             public int getSize() { return strings.length; }
+            @Override
             public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane2.setViewportView(jList1);
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel10.setText("By Group 1: Jericho T, Kenny K, Nicholas B");
+        jLabel10.setText("By Group 1: Jerico T, Kenny K, Nicholas B");
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel7.setText("Trie");
 
         jList3.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = {};
+            @Override
             public int getSize() { return strings.length; }
+            @Override
             public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane3.setViewportView(jList3);
@@ -148,94 +145,114 @@ public class UI extends javax.swing.JFrame {
             String inputText = jTextArea1.getText();
             String[] textList = inputText.split("\\s+");
             String wordInput = textList[textList.length - 1];
-            
-            try {
-                // Track memory before initialization
-                Runtime runtime = Runtime.getRuntime();
-                System.gc(); // Request garbage collection to get more accurate memory readings
-                String beforeInitMemory = Main.formatMemorySize(runtime.totalMemory() - runtime.freeMemory());
-                // System.out.println("Initial memory usage: " + formatMemorySize(beforeInitMemory));
 
-                System.gc(); // Request garbage collection
-                long beforeTrieMemory = runtime.totalMemory() - runtime.freeMemory();
-                List<String> allDataMain = new ArrayList<>();
+            public void actionPerformed(java.awt.event.ActionEvent evt){
+                // Initialize the Trie and TST
+                try {
+                    // Track memory before initialization
+                    Runtime runtime = Runtime.getRuntime();
+                    System.gc(); // Request garbage collection to get more accurate memory readings
+                    String beforeInitMemory = Main.formatMemorySize(runtime.totalMemory() - runtime.freeMemory());
+                    jLabel19.setText("Initial memory usage: " + beforeInitMemory);
+                    // System.out.println("Initial memory usage: " + formatMemorySize(beforeInitMemory));
+                    Main mainInstance = new Main("filtered_words.csv");
 
-                // Load only Trie first to measure its memory usage
-                long startTimeTrie = System.nanoTime();
-                Main.loadTrieDictionary("filtered_words.csv");
-                long endTimeTrie = System.nanoTime();
+                    // Load the dictionary into Trie
+                    System.gc(); // Request garbage collection
+                    long beforeTrieMemory = runtime.totalMemory() - runtime.freeMemory();
 
-                System.gc(); // Request garbage collection
-                long afterTrieMemory = runtime.totalMemory() - runtime.freeMemory();
-                String trieTimeSpent = (endTimeTrie - startTimeTrie) + " ns";
-                long trieMemoryUsage = afterTrieMemory - beforeTrieMemory;
+                    long startTimeTrie = System.nanoTime();
+                    mainInstance.loadTrieDictionary("filtered_words.csv");
+                    long endTimeTrie = System.nanoTime();
 
-                // Now create and load TST
-                System.out.println("\n===== LOADING TST =====");
-                System.gc(); // Request garbage collection
-                long beforeTSTMemory = runtime.totalMemory() - runtime.freeMemory();
+                    System.gc(); // Request garbage collection
+                    long afterTrieMemory = runtime.totalMemory() - runtime.freeMemory();
+                    String trieTimeSpent = (endTimeTrie - startTimeTrie) + " ns";
+                    long trieMemoryUsage = afterTrieMemory - beforeTrieMemory;
+                    jLabel20.setText("Word-loading Trie memory usage: " + Main.formatMemorySize(trieMemoryUsage));
+                    jLabel22.setText("Word-loading Trie time spent: " + trieTimeSpent);
 
-                long startTimeTST = System.nanoTime();
-                Main.loadTSTDictionary("filtered_words.csv");
-                long endTimeTST = System.nanoTime();
 
-                System.gc(); // Request garbage collection
-                long afterTSTMemory = runtime.totalMemory() - runtime.freeMemory();
-                String tstTimeSpent = (endTimeTST - startTimeTST) + " ns";
-                long tstMemoryUsage = afterTSTMemory - beforeTSTMemory;
+                    // Load the dictionary into TST
+                    System.gc(); // Request garbage collection
+                    long beforeTSTMemory = runtime.totalMemory() - runtime.freeMemory();
 
-                // Compare memory usage
-                // System.out.println("Trie vs TST memory difference: " + formatMemorySize(Math.abs(trieMemoryUsage - tstMemoryUsage)));
-                allDataMain.add(formatMemorySize(Math.abs(trieMemoryUsage - tstMemoryUsage)));
-                if (trieMemoryUsage > tstMemoryUsage) {
-                    // System.out.println("Trie uses more memory by " +
-                    //         String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
-                    allDataMain.add("Trie uses more memory by " + String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
-                } else if (tstMemoryUsage > trieMemoryUsage) {
-                    // System.out.println("TST uses more memory by " +
-                    //         String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
-                    allDataMain.add("TST uses more memory by " + String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
-                } else {
-                    // System.out.println("Both data structures use the same amount of memory.");
-                    allDataMain.add("Both data structures use the same amount of memory.");
+                    long startTimeTST = System.nanoTime();
+                    mainInstance.loadTSTDictionary("filtered_words.csv");
+                    long endTimeTST = System.nanoTime();
+
+                    System.gc(); // Request garbage collection
+                    long afterTSTMemory = runtime.totalMemory() - runtime.freeMemory();
+                    String tstTimeSpent = (endTimeTST - startTimeTST) + " ns";
+                    long tstMemoryUsage = afterTSTMemory - beforeTSTMemory;
+                    jLabel21.setText("Word-loading TST memory usage: " + Main.formatMemorySize(tstMemoryUsage));
+                    jLabel23.setText("Word-loading TST time spent: " + tstTimeSpent);
+
+                    // Compare memory usage
+                    // System.out.println("Trie vs TST memory difference: " + formatMemorySize(Math.abs(trieMemoryUsage - tstMemoryUsage)));
+                    if (trieMemoryUsage > tstMemoryUsage) {
+                        // System.out.println("Trie uses more memory by " +
+                        //         String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
+                        jLabel5.setText("Trie uses more memory by " + String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
+                    } else if (tstMemoryUsage > trieMemoryUsage) {
+                        // System.out.println("TST uses more memory by " +
+                        //         String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
+                        jLabel5.setText("TST uses more memory by " + String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
+                    } else {
+                        // System.out.println("Both data structures use the same amount of memory.");
+                        jLabel5.setText("Both data structures use the same amount of memory.");
+                    }
+
+                    // Test the autocomplete system
+                    // RUNNING TRIE
+                    System.gc();
+
+                    List<List<String>> trieOutput = mainInstance.suggestWithTrie(wordInput, 5);
+                    List<String> trieSuggestWords = new ArrayList<>();
+                    List<String> trieData = new ArrayList<>();
+
+                    for (String word : trieOutput.get(0)) {
+                        trieSuggestWords.add(word);
+                    }
+                    for (String data : trieOutput.get(1)) {
+                        trieData.add(data);
+                    }
+
+                    // Display the memory and time spent for Trie
+                    jLabel9.setText("Total memory used (Trie): " + trieData.get(0));
+                    jLabel12.setText("Total time spent (Trie): " + trieData.get(1));
+                    
+                    // Insert all word suggestions into JList
+                    jList3.setListData(trieSuggestWords.toArray(new String[5]));
+
+                    System.gc();
+
+                    // RUNNING TST
+                    List<List<String>> tstOutput = mainInstance.suggestWithTST(wordInput, 5);
+                    List<String> tstSuggestWords = new ArrayList<>();
+                    List<String> tstData = new ArrayList<>();
+                    for (String word : trieOutput.get(0)) {
+                        tstSuggestWords.add(word);
+                    }
+                    for (String data : trieOutput.get(1)) {
+                        tstData.add(data);
+                    }
+                    // Display the memory and time spent for TST
+                    jLabel16.setText("Total memory used (TST): " + tstData.get(0));
+                    jLabel17.setText("Total time spent (TST): " + tstData.get(1));
+                    
+                    // Insert all word suggestions into JList
+                    jList1.setListData(tstSuggestWords.toArray(new String[5]));
+
+
+                } catch (IOException | CsvException e) {
+                    e.printStackTrace();
                 }
 
-                // Test the autocomplete system
-                // String input = "prog";
-
-                // Memory before Trie suggestion
-                System.gc();
-
-                // RUNNING TRIE
-                List<List<String>> trieOutput = autocomplete.suggestWithTrie(wordInput, 5);
-                // System.out.println("Time taken by Trie: " + (endTime - startTime) + " ns");
-
-                // Memory after Trie suggestion
-                System.gc();
-                // System.out.println("Memory used during Trie suggestion: " +
-                //         formatMemorySize(afterTrieSuggestionMemory - beforeTrieSuggestionMemory));
-                
-
-                // Memory before TST suggestion
-                System.gc();
-
-                // RUNNING TST
-                List<List<String>> tstOutput = autocomplete.suggestWithTST(wordInput, 5);
-                // System.out.println("Time taken by TST: " + (endTime - startTime) + " ns");
-
-                // Memory after TST suggestion
-                System.gc();
-                // System.out.println("Memory used during TST suggestion: " +
-                //         formatMemorySize(afterTSTSuggestionMemory - beforeTSTSuggestionMemory));
-
-            } catch (IOException | CsvException e) {
-                e.printStackTrace();
-            }
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button1ActionPerformed(evt);
-            }
-        });
+                // Update the UI with the results
+                    button1ActionPerformed(evt);
+                }
+            });
 
         jLabel5.setText("Memory Info: ");
 

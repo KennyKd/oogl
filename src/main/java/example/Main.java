@@ -9,134 +9,121 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
 public class Main {
-    private final Trie trie;
-    private final TernarySearchTree tst;
-    public static String beforeInitMemory;
-    public static long trieLoadTime;
-    public static long tstLoadTime;
-    public static long trieMemoryUsage;
-    public static long tstMemoryUsage;
+    private Trie trie;
+    private TernarySearchTree tst;
+    // public static String beforeInitMemory;
+    // public static long trieLoadTime;
+    // public static long tstLoadTime;
+    // public static long trieMemoryUsage;
+    // public static long tstMemoryUsage;
 
-    public static void main(String[] args, String input) {
-        try {
-            // Track memory before initialization
-            System.out.println("===== STARTING MEMORY TRACKING =====");
-            Runtime runtime = Runtime.getRuntime();
-            System.gc(); // Request garbage collection to get more accurate memory readings
-            beforeInitMemory = formatMemorySize(runtime.totalMemory() - runtime.freeMemory());
-            // System.out.println("Initial memory usage: " + formatMemorySize(beforeInitMemory));
+    // public static void main(String[] args, String input) {
+    //     try {
+    //         // Track memory before initialization
+    //         System.out.println("===== STARTING MEMORY TRACKING =====");
+    //         Runtime runtime = Runtime.getRuntime();
+    //         System.gc(); // Request garbage collection to get more accurate memory readings
+    //         beforeInitMemory = formatMemorySize(runtime.totalMemory() - runtime.freeMemory());
+    //         // System.out.println("Initial memory usage: " + formatMemorySize(beforeInitMemory));
 
 
-            Main autocomplete = new Main("filtered_words.csv");
+    //         Main autocomplete = new Main("filtered_words.csv");
 
-            // Test the autocomplete system
-            // String input = "prog";
+    //         // Test the autocomplete system
+    //         // String input = "prog";
 
-            // Memory before Trie suggestion
-            System.gc();
-            long beforeTrieSuggestionMemory = runtime.totalMemory() - runtime.freeMemory();
+    //         // Memory before Trie suggestion
+    //         System.gc();
+    //         long beforeTrieSuggestionMemory = runtime.totalMemory() - runtime.freeMemory();
 
-            // RUNNING TRIE
-            long startTime = System.nanoTime();
-            List<List<String>> trieOutput = autocomplete.suggestWithTrie(input, 5);
-            long endTime = System.nanoTime();
-            // System.out.println("Time taken by Trie: " + (endTime - startTime) + " ns");
-            String trieTimeSpent = (endTime - startTime) + " ns";
+    //         // RUNNING TRIE
+    //         long startTime = System.nanoTime();
+    //         List<List<String>> trieOutput = autocomplete.suggestWithTrie(input, 5);
+    //         long endTime = System.nanoTime();
+    //         // System.out.println("Time taken by Trie: " + (endTime - startTime) + " ns");
+    //         String trieTimeSpent = (endTime - startTime) + " ns";
 
-            // Memory after Trie suggestion
-            System.gc();
-            long afterTrieSuggestionMemory = runtime.totalMemory() - runtime.freeMemory();
-            // System.out.println("Memory used during Trie suggestion: " +
-            //         formatMemorySize(afterTrieSuggestionMemory - beforeTrieSuggestionMemory));
-            String trieMemoryUsed = formatMemorySize(afterTrieSuggestionMemory - beforeTrieSuggestionMemory);
+    //         // Memory after Trie suggestion
+    //         System.gc();
+    //         long afterTrieSuggestionMemory = runtime.totalMemory() - runtime.freeMemory();
+    //         // System.out.println("Memory used during Trie suggestion: " +
+    //         //         formatMemorySize(afterTrieSuggestionMemory - beforeTrieSuggestionMemory));
+    //         String trieMemoryUsed = formatMemorySize(afterTrieSuggestionMemory - beforeTrieSuggestionMemory);
 
-            // Memory before TST suggestion
-            System.gc();
-            long beforeTSTSuggestionMemory = runtime.totalMemory() - runtime.freeMemory();
+    //         // Memory before TST suggestion
+    //         System.gc();
+    //         long beforeTSTSuggestionMemory = runtime.totalMemory() - runtime.freeMemory();
 
-            // RUNNING TST
-            startTime = System.nanoTime();
-            List<List<String>> tstOutput = autocomplete.suggestWithTST(input, 5);
-            endTime = System.nanoTime();
-            // System.out.println("Time taken by TST: " + (endTime - startTime) + " ns");
-            String tstTimeSpent = (endTime - startTime) + " ns";
+    //         // RUNNING TST
+    //         startTime = System.nanoTime();
+    //         List<List<String>> tstOutput = autocomplete.suggestWithTST(input, 5);
+    //         endTime = System.nanoTime();
+    //         // System.out.println("Time taken by TST: " + (endTime - startTime) + " ns");
+    //         String tstTimeSpent = (endTime - startTime) + " ns";
 
-            // Memory after TST suggestion
-            System.gc();
-            long afterTSTSuggestionMemory = runtime.totalMemory() - runtime.freeMemory();
-            // System.out.println("Memory used during TST suggestion: " +
-            //         formatMemorySize(afterTSTSuggestionMemory - beforeTSTSuggestionMemory));
-            String tstMemoryUsed = formatMemorySize(afterTSTSuggestionMemory - beforeTSTSuggestionMemory);
+    //         // Memory after TST suggestion
+    //         System.gc();
+    //         long afterTSTSuggestionMemory = runtime.totalMemory() - runtime.freeMemory();
+    //         // System.out.println("Memory used during TST suggestion: " +
+    //         //         formatMemorySize(afterTSTSuggestionMemory - beforeTSTSuggestionMemory));
+    //         String tstMemoryUsed = formatMemorySize(afterTSTSuggestionMemory - beforeTSTSuggestionMemory);
 
-        } catch (IOException | CsvException e) {
-            e.printStackTrace();
-        }
-    }
+    //     } catch (IOException | CsvException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     public Main(String dictionaryFile) throws IOException, CsvException {
         // Track memory before creating data structures
-        Runtime runtime = Runtime.getRuntime();
+        // Runtime runtime = Runtime.getRuntime();
         System.gc(); // Request garbage collection
-        long beforeTrieMemory = runtime.totalMemory() - runtime.freeMemory();
-        List<String> allDataMain = new ArrayList<>();
+        // long beforeTrieMemory = runtime.totalMemory() - runtime.freeMemory();
+        // List<String> allDataMain = new ArrayList<>();
 
         this.trie = new Trie();
         // Load only Trie first to measure its memory usage
-        long startTimeTrie = System.nanoTime();
-        loadTrieDictionary(dictionaryFile);
-        long endTimeTrie = System.nanoTime();
+        // long startTimeTrie = System.nanoTime();
+        // long endTimeTrie = System.nanoTime();
 
-        System.gc(); // Request garbage collection
-        long afterTrieMemory = runtime.totalMemory() - runtime.freeMemory();
-        trieMemoryUsage = afterTrieMemory - beforeTrieMemory;
+        // System.gc(); // Request garbage collection
+        // long afterTrieMemory = runtime.totalMemory() - runtime.freeMemory();
+        // trieMemoryUsage = afterTrieMemory - beforeTrieMemory;
 
-        System.out.println("Time taken to load Trie: " + (endTimeTrie - startTimeTrie) + " ns");
-        System.out.println("Trie Memory Usage: " + formatMemorySize(trieMemoryUsage));
+        // System.out.println("Time taken to load Trie: " + (endTimeTrie - startTimeTrie) + " ns");
+        // System.out.println("Trie Memory Usage: " + formatMemorySize(trieMemoryUsage));
 
         // Now create and load TST
-        System.out.println("\n===== LOADING TST =====");
         System.gc(); // Request garbage collection
-        long beforeTSTMemory = runtime.totalMemory() - runtime.freeMemory();
+        // long beforeTSTMemory = runtime.totalMemory() - runtime.freeMemory();
 
         this.tst = new TernarySearchTree();
-        long startTimeTST = System.nanoTime();
-        loadTSTDictionary(dictionaryFile);
-        long endTimeTST = System.nanoTime();
+        // long startTimeTST = System.nanoTime();
+        // long endTimeTST = System.nanoTime();
 
-        System.gc(); // Request garbage collection
-        long afterTSTMemory = runtime.totalMemory() - runtime.freeMemory();
-        long tstMemoryUsage = afterTSTMemory - beforeTSTMemory;
+        // System.gc(); // Request garbage collection
+        // long afterTSTMemory = runtime.totalMemory() - runtime.freeMemory();
+        // long tstMemoryUsage = afterTSTMemory - beforeTSTMemory;
 
-        System.out.println("Time taken to load TST: " + (endTimeTST - startTimeTST) + " ns");
-        System.out.println("TST Memory Usage: " + formatMemorySize(tstMemoryUsage));
+        // System.out.println("Time taken to load TST: " + (endTimeTST - startTimeTST) + " ns");
+        // System.out.println("TST Memory Usage: " + formatMemorySize(tstMemoryUsage));
 
         // Compare memory usage
         // System.out.println("Trie vs TST memory difference: " + formatMemorySize(Math.abs(trieMemoryUsage - tstMemoryUsage)));
-        allDataMain.add(formatMemorySize(Math.abs(trieMemoryUsage - tstMemoryUsage)));
-        if (trieMemoryUsage > tstMemoryUsage) {
-            // System.out.println("Trie uses more memory by " +
-            //         String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
-            allDataMain.add("Trie uses more memory by " + String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
-        } else if (tstMemoryUsage > trieMemoryUsage) {
-            // System.out.println("TST uses more memory by " +
-            //         String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
-            allDataMain.add("TST uses more memory by " + String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
-        } else {
-            // System.out.println("Both data structures use the same amount of memory.");
-            allDataMain.add("Both data structures use the same amount of memory.");
-        }
+        // allDataMain.add(formatMemorySize(Math.abs(trieMemoryUsage - tstMemoryUsage)));
+        // if (trieMemoryUsage > tstMemoryUsage) {
+        //     // System.out.println("Trie uses more memory by " +
+        //     //         String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
+        //     allDataMain.add("Trie uses more memory by " + String.format("%.2f%%", (double)(trieMemoryUsage - tstMemoryUsage) * 100 / tstMemoryUsage));
+        // } else if (tstMemoryUsage > trieMemoryUsage) {
+        //     // System.out.println("TST uses more memory by " +
+        //     //         String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
+        //     allDataMain.add("TST uses more memory by " + String.format("%.2f%%", (double)(tstMemoryUsage - trieMemoryUsage) * 100 / trieMemoryUsage));
+        // } else {
+        //     // System.out.println("Both data structures use the same amount of memory.");
+        //     allDataMain.add("Both data structures use the same amount of memory.");
+        // }
 
         // return allData;
-    }
-
-
-    public List<String> getStatData() {
-        List<String> allData = new ArrayList<>();
-        allData.add("Trie Memory Usage: " + formatMemorySize(trieMemoryUsage));
-        allData.add("TST Memory Usage: " + formatMemorySize(tstMemoryUsage));
-        allData.add("Trie Word Loading Time: " + trieLoadTime);
-        allData.add("TST Word Loading Time: " + tstLoadTime);
-        return allData;
     }
 
     public static String formatMemorySize(long bytes) {
@@ -206,15 +193,15 @@ public class Main {
         long endTime = System.nanoTime();
         System.gc();
         long endMemoryLong = runtime.totalMemory() - runtime.freeMemory();
-        String endMemory = String.valueOf(runtime.totalMemory() - runtime.freeMemory());
         String totalMemory = formatMemorySize(endMemoryLong - startMemory);
         String operationTime = (endTime - startTime) + " ns";
-
+        List<String> Stat = new ArrayList<>();
+        Stat.add(totalMemory);
+        Stat.add(operationTime);
         List<List<String>> allData = new ArrayList<>();
         allData.add(suggestions);
-        allData.add(List.of(String.valueOf(endMemory)));
-        allData.add(List.of(totalMemory));
-        allData.add(List.of(operationTime));
+        allData.add(Stat);
+        
         return allData;
     }
 
@@ -230,15 +217,14 @@ public class Main {
         long endTime = System.nanoTime();
         System.gc();
         long endMemoryLong = runtime.totalMemory() - runtime.freeMemory();
-        String endMemory = String.valueOf(runtime.totalMemory() - runtime.freeMemory());
         String totalMemory = formatMemorySize(endMemoryLong - startMemory);
         String operationTime = (endTime - startTime) + " ns";
-
+        List<String> Stat = new ArrayList<>();
+        Stat.add(totalMemory);
+        Stat.add(operationTime);
         List<List<String>> allData = new ArrayList<>();
         allData.add(suggestions);
-        allData.add(List.of(String.valueOf(endMemory)));
-        allData.add(List.of(totalMemory));
-        allData.add(List.of(operationTime));
+        allData.add(Stat);
         return allData;
     }
 }
