@@ -154,7 +154,7 @@ public class Main {
                 }
             }
         }
-        // System.out.println("Loaded " + wordCount + " words into Trie");
+        System.out.println("Loaded " + wordCount + " words into Trie");
     }
 
     public void loadTSTDictionary(String dictionaryFile) throws IOException, CsvException {
@@ -178,11 +178,13 @@ public class Main {
                 }
             }
         }
-        // System.out.println("Loaded " + wordCount + " words into TST");
+        System.out.println("Loaded " + wordCount + " words into TST");
     }
 
     public List<List<String>> suggestWithTrie(String prefix, int limit) {
         // Track memory and time for Trie suggestion operation
+        System.out.println("Prefix of Trie: " + prefix);
+
         Runtime runtime = Runtime.getRuntime();
         System.gc();
         long startMemory = runtime.totalMemory() - runtime.freeMemory();
@@ -201,12 +203,16 @@ public class Main {
         List<List<String>> allData = new ArrayList<>();
         allData.add(suggestions);
         allData.add(Stat);
+
+        System.out.println(allData);
         
         return allData;
     }
 
     public List<List<String>> suggestWithTST(String prefix, int limit) {
         // Track memory and time for TST suggestion operation
+        System.out.println("Prefix of TST: " + prefix);
+
         Runtime runtime = Runtime.getRuntime();
         System.gc();
         long startMemory = runtime.totalMemory() - runtime.freeMemory();
@@ -225,6 +231,8 @@ public class Main {
         List<List<String>> allData = new ArrayList<>();
         allData.add(suggestions);
         allData.add(Stat);
+
+        System.out.println(allData);
         return allData;
     }
 }

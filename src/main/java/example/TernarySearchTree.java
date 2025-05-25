@@ -60,6 +60,7 @@ public class TernarySearchTree {
 
         collectWords(lastNode.middle, prefix, suggestions, limit);
 
+        System.out.println(suggestions);
         return suggestions;
     }
 

@@ -39,6 +39,8 @@ public class Trie {
                 count++;
             }
         }
+        System.out.println(suggestions);
+
         return suggestions;
     }
 

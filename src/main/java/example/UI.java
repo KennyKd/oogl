@@ -5,9 +5,7 @@
 package example;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.FileReader;
 import java.io.IOException;
-import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
 /**
@@ -142,18 +140,22 @@ public class UI extends javax.swing.JFrame {
 
         button1.setLabel("button1");
         button1.addActionListener(new java.awt.event.ActionListener() {
-            String inputText = jTextArea1.getText();
-            String[] textList = inputText.split("\\s+");
-            String wordInput = textList[textList.length - 1];
-
             public void actionPerformed(java.awt.event.ActionEvent evt){
                 // Initialize the Trie and TST
                 try {
+                    String inputText = jTextArea1.getText().trim();
+                    if (inputText.isEmpty()){
+                        jLabel5.setText("Please enter a word.");
+                    }
+
+                    String[] textList = inputText.split("\\s+");
+                    String wordInput = textList[textList.length - 1];
                     // Track memory before initialization
                     Runtime runtime = Runtime.getRuntime();
                     System.gc(); // Request garbage collection to get more accurate memory readings
                     String beforeInitMemory = Main.formatMemorySize(runtime.totalMemory() - runtime.freeMemory());
                     jLabel19.setText("Initial memory usage: " + beforeInitMemory);
+                    System.out.println(beforeInitMemory);
                     // System.out.println("Initial memory usage: " + formatMemorySize(beforeInitMemory));
                     Main mainInstance = new Main("filtered_words.csv");
 
@@ -162,6 +164,7 @@ public class UI extends javax.swing.JFrame {
                     long beforeTrieMemory = runtime.totalMemory() - runtime.freeMemory();
 
                     long startTimeTrie = System.nanoTime();
+                    System.out.println("Load Trie called.");
                     mainInstance.loadTrieDictionary("filtered_words.csv");
                     long endTimeTrie = System.nanoTime();
 
@@ -178,6 +181,7 @@ public class UI extends javax.swing.JFrame {
                     long beforeTSTMemory = runtime.totalMemory() - runtime.freeMemory();
 
                     long startTimeTST = System.nanoTime();
+                    System.out.println("Load TST called.");
                     mainInstance.loadTSTDictionary("filtered_words.csv");
                     long endTimeTST = System.nanoTime();
 
@@ -214,16 +218,18 @@ public class UI extends javax.swing.JFrame {
                     for (String word : trieOutput.get(0)) {
                         trieSuggestWords.add(word);
                     }
+                    System.out.println(trieSuggestWords);
                     for (String data : trieOutput.get(1)) {
                         trieData.add(data);
                     }
+                    System.out.println(trieData);
 
                     // Display the memory and time spent for Trie
                     jLabel9.setText("Total memory used (Trie): " + trieData.get(0));
                     jLabel12.setText("Total time spent (Trie): " + trieData.get(1));
                     
                     // Insert all word suggestions into JList
-                    jList3.setListData(trieSuggestWords.toArray(new String[5]));
+                    jList1.setListData(trieSuggestWords.toArray(new String[5]));
 
                     System.gc();
 
@@ -231,10 +237,10 @@ public class UI extends javax.swing.JFrame {
                     List<List<String>> tstOutput = mainInstance.suggestWithTST(wordInput, 5);
                     List<String> tstSuggestWords = new ArrayList<>();
                     List<String> tstData = new ArrayList<>();
-                    for (String word : trieOutput.get(0)) {
+                    for (String word : tstOutput.get(0)) {
                         tstSuggestWords.add(word);
                     }
-                    for (String data : trieOutput.get(1)) {
+                    for (String data : tstOutput.get(1)) {
                         tstData.add(data);
                     }
                     // Display the memory and time spent for TST
@@ -242,7 +248,7 @@ public class UI extends javax.swing.JFrame {
                     jLabel17.setText("Total time spent (TST): " + tstData.get(1));
                     
                     // Insert all word suggestions into JList
-                    jList1.setListData(tstSuggestWords.toArray(new String[5]));
+                    jList3.setListData(tstSuggestWords.toArray(new String[5]));
 
 
                 } catch (IOException | CsvException e) {
