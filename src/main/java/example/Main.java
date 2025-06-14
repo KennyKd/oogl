@@ -73,10 +73,10 @@ public class Main {
     //     }
     // }
 
-    public Main(String dictionaryFile) throws IOException, CsvException {
+    public Main() {
         // Track memory before creating data structures
         // Runtime runtime = Runtime.getRuntime();
-        System.gc(); // Request garbage collection
+        // System.gc(); // Request garbage collection
         // long beforeTrieMemory = runtime.totalMemory() - runtime.freeMemory();
         // List<String> allDataMain = new ArrayList<>();
 
@@ -93,7 +93,7 @@ public class Main {
         // System.out.println("Trie Memory Usage: " + formatMemorySize(trieMemoryUsage));
 
         // Now create and load TST
-        System.gc(); // Request garbage collection
+        // System.gc(); // Request garbage collection
         // long beforeTSTMemory = runtime.totalMemory() - runtime.freeMemory();
 
         this.tst = new TernarySearchTree();

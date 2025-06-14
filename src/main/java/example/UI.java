@@ -157,7 +157,7 @@ public class UI extends javax.swing.JFrame {
                     jLabel19.setText("Initial memory usage: " + beforeInitMemory);
                     System.out.println(beforeInitMemory);
                     // System.out.println("Initial memory usage: " + formatMemorySize(beforeInitMemory));
-                    Main mainInstance = new Main("filtered_words.csv");
+                    Main mainInstance = new Main();
 
                     // Load the dictionary into Trie
                     System.gc(); // Request garbage collection
