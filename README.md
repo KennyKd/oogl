@@ -24,4 +24,4 @@ The system provides real-time suggestions for word completions based on prefix i
 
 ## Preview
 
-![alt text] 
+![SC1] (Screenshot/SC1.png)
