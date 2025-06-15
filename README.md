@@ -24,4 +24,6 @@ The system provides real-time suggestions for word completions based on prefix i
 
 ## Preview
 
-![SC1] (Screenshot/SC1.png)
+![SC1](https://github.com/KennyKd/oogl/blob/67069b7a7a213824f043a6255db4c61dadcaea3b/Screenshot/SC1.png)
+
+![SC2](https://github.com/KennyKd/oogl/blob/61ce553e5081c2ad8da23fa6dd0897835e26a6bd/Screenshot/SC2.png)
