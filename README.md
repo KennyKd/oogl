@@ -1,6 +1,6 @@
 # Autocomplete System: Trie vs Ternary Search Tree
 
-This project is an autocomplete system that compares two core data structures—**Trie** and **Ternary Search Tree (TST)**—in terms of performance, memory efficiency, and accuracy. 
+This project is an autocomplete system that compares two core data structures **Trie** and **Ternary Search Tree (TST)** in terms of performance, memory efficiency, and accuracy. 
 
 The system provides real-time suggestions for word completions based on prefix inputs, optimized using frequency-based relevance filtering.
 
